@@ -1,0 +1,7 @@
+/node_modules
+/public
+/coverage
+/garbage
+/test
+/test-report
+/.nyc_output
