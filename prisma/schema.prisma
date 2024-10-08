@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(cuid()) // Unique identifier for the user
+  name        String
+  email       String        @unique
+  password    String
+  otp         Int?
+  image       String?
+  isActive    Boolean       @default(true)
+  isDeleted   Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  ControlFrom ControlFrom[]
+}
+
+model Admin {
+  id        String   @id @default(cuid()) // Unique identifier for the admin
+  name      String
+  email     String   @unique
+  password  String
+  image     String?
+  number    String?
+  otp       Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ControlFrom ControlFrom[]
+}
+
+// model Equipment {
+//   id          String        @id @default(cuid()) // Unique identifier for the equipment
+//   type        String // Type of the equipment (e.g., 'Siphon de sol' or 'Avaloir')
+//   createdAt   DateTime      @default(now())
+//   updatedAt   DateTime      @updatedAt
+//   ControlFrom ControlFrom[]
+// }
+
+model ControlFrom {
+  id                String   @id @default(cuid()) // Unique identifier for the inspection
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  // Siphon de sol fields
+  garde_en_eau      Boolean?
+  presence_grille   Boolean? // Avalor fields
+  etat_gille        Boolean? // Avalor fields
+  presence_cloche   Boolean?
+  etat_cloche       Boolean?
+  profondeur_cloche Boolean?
+  bon_ecoulement    Boolean?  // Avalor fields
+  functionalPhotoId String // Links to the functional photo
+  extractedText     String // Text extracted from the photo
+  FunctionalPhoto   FunctionalPhoto @relation(fields: [functionalPhotoId], references: [id])
+  materialPhotoId   String // Links to the material photo
+  MaterialPhoto     MaterialPhoto   @relation(fields: [materialPhotoId], references: [id])
+  equipment         String? //  equipment text 
+  userId            String // Link to the user who conducted the inspection
+  User              User            @relation(fields: [userId], references: [id])
+  adminId           String? // Link to the user who conducted the inspection
+  Admin             Admin?          @relation(fields: [adminId], references: [id])
+}
+
+// model Inspection {
+//   id            String        @id @default(cuid()) // Unique identifier for the inspection
+//   createdAt     DateTime      @default(now())
+//   updatedAt     DateTime      @updatedAt
+//   userId        String // The user who conducted the user
+//   User          User          @relation(fields: [userId], references: [id]) // Relationship to the user
+//   extractedText String // Text extracted from the photo
+//   ControlFrom   ControlFrom[]
+// }
+
+// Updated model for Functional Photos
+model FunctionalPhoto {
+  id            String        @id @default(cuid()) // Unique identifier for the functional photo
+  imageUrl      String // URL of the functional photo
+  extractedText String // Text extracted from the photo
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  // inspections   Inspection[] // Inspections linked to this functional photo
+  ControlFrom   ControlFrom[]
+}
+
+// Updated model for Material Photos
+model MaterialPhoto {
+  id            String        @id @default(cuid()) // Unique identifier for the material photo
+  imageUrl      String // URL of the material photo
+  extractedText String // Text extracted from the photo
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  ControlFrom   ControlFrom[]
+}
